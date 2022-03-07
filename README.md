@@ -39,36 +39,42 @@ Builds the containers
     make build
 
 - Deploy
+
 Deploys the containers on microk8s 
 
 
     make deploy
 
 - Delete
+
 Deletes the containers from microk8s 
 
 
     make delete 
 
 - Create DNS
+
 Creates DNS entires for the services deployed.
 
     
     make create_dns
 
 - Clear DNS 
+
 Removes DNS entires created in etc hosts file
 
     
     make clear_dns 
 
 - Credentials
+
 Retrives credentials for the installed stack 
 
     
     make credentials 
 
 - Clean up
+
 Cleans up microk8s installation
 
 
