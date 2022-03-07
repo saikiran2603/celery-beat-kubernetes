@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: celery-beat
+  namespace: test-stack
+  labels:
+    app: celery-beat
+spec:
+ replicas: 1
+ selector:
+   matchLabels:
+     app: celery-beat
+ template:
+    metadata:
+      labels:
+        app: celery-beat
+    spec:
+      containers:
+      - name: celery-beat
+        image: ${REGISTRY}/celery-beat:${TAG}
+        ports:
+        - containerPort: 8080
+        env:
+          - name: MONGODB_SERVER
+            value: "celery-mongodb-0.celery-mongodb-headless.celery-mongodb.svc.cluster.local,celery-mongodb-1.celery-mongodb-headless.celery-mongodb.svc.cluster.local"
+          - name: RABBITMQ_SERVER
+            value: 'rabbitmq.celery-rabbitmq:5672'
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "250m"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: celery-beat
+  namespace: test-stack
+  labels:
+    app: celery-beat
+spec:
+  ports:
+  - port: 8080
+  selector:
+    app: celery-beat
+
+---
+
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: celery-beat
+  namespace: test-stack
+spec:
+  maxReplicas: 10
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: celery-beat
+  targetCPUUtilizationPercentage: 50
